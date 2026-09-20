@@ -226,6 +226,20 @@ task reconcile               # force Flux sync
 - **`k8scc/`** — Source for `ghcr.io/ferry133/claude-code`: Claude Code CLI + ttyd web terminal Docker image (Dockerfile + entrypoint), deployed as the `claudecode/claude-code` extra
 - **`referenceapp/`** — Flutter reference apps (bloc samples)
 
+## kubeconfig 慣例（2026-09-20 ferry133 裁定，選項 (b)）
+
+每座 Omni 管的叢集 repo 目錄裡**兩份都留**，各有一個使用者：
+
+| 檔 | 內容 | 誰用 |
+|---|---|---|
+| `kubeconfig` | Omni 簽的 **OIDC**（`exec: kubectl oidc-login`，第一次用要瀏覽器登入） | **人**。`.mise.toml` 把 `KUBECONFIG` 釘在它，所以在 repo 目錄直接打 `kubectl`／`task bootstrap:apps` 用的是它 |
+| `kubeconfig-sa` | Omni service-account token（`omnictl kubeconfig --service-account --user <who> --force ./kubeconfig-sa`） | **所有 agent**。原話：「All the agents should use kubeconfig-sa to avoid "authorize web" operation that require human involves.」 |
+
+- **agent 打 kubectl 一律顯式 `--kubeconfig ./kubeconfig-sa`**（旗標贏過環境變數；`KUBECONFIG=…` 在 `mise exec` 裡會被蓋回）。skill 與 runbook 裡的指令照這樣寫。
+- **不要用 SA 覆蓋 `<repo>/kubeconfig`**——2026-09-18 重建時做過一次，09-20 量到兩座的 `kubeconfig` 都變成 token 型、OIDC 退路消失，因此有這條裁定。重建後要**兩份各簽一次**。
+- `jcom` 不在 Omni（憑證型 kubeconfig，無瀏覽器步），這條對它不適用。
+- 兩份都在 `.gitignore` 的 `kubeconfig*` 裡，也都在委付 bundle（`untracked.tar.gz.age`）裡；換過任何一份就 `escrow-refresh`。
+
 ## Common Tooling (All Cluster Projects)
 
 - **mise** — manages all CLIs (kubectl, talosctl, flux, sops, age, etc.)
