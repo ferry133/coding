@@ -236,6 +236,25 @@ task reconcile               # force Flux sync
 | `kubeconfig-sa` | Omni service-account token（`omnictl kubeconfig --service-account --user <who> --force ./kubeconfig-sa`） | **所有 agent**。原話：「All the agents should use kubeconfig-sa to avoid "authorize web" operation that require human involves.」 |
 
 - **agent 打 kubectl 一律顯式 `--kubeconfig ./kubeconfig-sa`**（旗標贏過環境變數；`KUBECONFIG=…` 在 `mise exec` 裡會被蓋回）。skill 與 runbook 裡的指令照這樣寫。
+- ⛔ **但 `task <target>` 不是你的指令——它吃 mise 釘住的 `KUBECONFIG`，也就是 OIDC 那份，然後開瀏覽器。**
+  2026-09-27 在 jg-jiahd 量到並讓 ferry133 的機器跳出 Omni 授權視窗：`task reconcile` 回
+  `authcode-browser error … context deadline exceeded`。成因是 `mise exec -- sh -c 'echo $KUBECONFIG'`
+  → `<repo>/kubeconfig`，而 `kubeconfig` 有 2 處 `oidc-login`／`kubeconfig-sa` 是 token。
+  **顯式 `--kubeconfig` 救不了它**，因為那個旗標是給 `kubectl` 的，`task` 裡面的指令看不到。
+  **每一個會打叢集的 task target 都要這樣跑**（絕對路徑——相對路徑在 task 換目錄後失效）：
+
+      mise exec -- env KUBECONFIG="$HOME/coding/<cluster>/kubeconfig-sa" task <target>
+
+  ⚠️ **`task reconcile` 還有一道 env 蓋不掉的前置條件**（2026-10-01 在剛供裝的 `jg-jcc2` 量到）：`Taskfile.yaml:15`
+  自己定義 `KUBECONFIG: '{{.ROOT_DIR}}/kubeconfig'`，`:71` 的 precondition `test -f {{.KUBECONFIG}}` 查的是**人用的那份**
+  存不存在——上面那行 `env KUBECONFIG=…` 對 Taskfile 變數無效。全由 agent 供裝、操作員還沒簽 `./kubeconfig` 的 repo 會回
+  `precondition not met`。**那時的 agent 路徑是直接叫 flux**：
+  `mise exec -- flux --kubeconfig ./kubeconfig-sa reconcile kustomization flux-system --with-source`（效果相同，8 秒套用完）。
+  兩份都在的叢集（jg-jiahd、jcom）看不到這一格，所以它只在**新供裝**時咬人。
+
+  ⚠️ **這一條對每一座都成立**，不只重建過的那些；`bootstrap-apps.sh` 那個已知案例
+  （`fleet-ops .claude/skills/cuc-restore-cluster`）是同一個成因的另一個實例，先前只記在
+  那一座的脈絡裡。**失敗的樣子是「開瀏覽器等人」，在非互動情境下等於死掉。**
 - **不要用 SA 覆蓋 `<repo>/kubeconfig`**——2026-09-18 重建時做過一次，09-20 量到兩座的 `kubeconfig` 都變成 token 型、OIDC 退路消失，因此有這條裁定。重建後要**兩份各簽一次**。
 - `jcom` 不在 Omni（憑證型 kubeconfig，無瀏覽器步），這條對它不適用。
 - 兩份都在 `.gitignore` 的 `kubeconfig*` 裡，也都在委付 bundle（`untracked.tar.gz.age`）裡；換過任何一份就 `escrow-refresh`。
