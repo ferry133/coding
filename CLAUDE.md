@@ -31,7 +31,7 @@ jgct#67/#68 撞車案）仍住在 `fleet-ops/docs/agents/responsibilities.md`—
 | agent | ＝ 誰 | 擁有 |
 |---|---|---|
 | **fleet-ops agent** | 工作目錄在 `~/coding/fleet-ops` 的每一個 session | 所有 user repo（`jg-jiahd`、`jcom`、`jg-janncotcc`…含未來新建的）的產生、修正、維護運行；所有 Operation SOP 的建立（檔案住 `fleet-ops/docs/operations/`）；跨 repo 編排（`routing-log.md`、`fleet-index.md`） |
-| **jg-base agent** | 工作目錄在 `~/coding/jg-base` 的每一個 session | `jg-base` 與 `jg-cluster-template` |
+| **jg-base agent** | 工作目錄在 `~/coding/jg-base` 的每一個 session | `jg-base`、`jg-cluster-template`，以及 **`jg-extras`**（2026-10-18 ferry133 裁定；由 jg-base 子樹拆出的第二個受信任來源，private） |
 
 - **「agent」是目錄，不是單一 session**——同目錄的所有 session 共同擁有。
   ferry133 原話（2026-09-03）：「all the sessions running on jg-base directory own
