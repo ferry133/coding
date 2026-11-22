@@ -205,7 +205,7 @@ session 從那裡起，而不是從某個 project repo——住在自己路由�
 - **這台 Mac 上有帳號的只有 `fo`、`jg-base`、`k8scc` 三個資料夾。**
   - 身分由資料夾裡的 `.chamber-identity` 決定；伺服器網址在 `~/.claude/chamber/config.json`；憑證在 keychain 的 `chamber-login`。
   - 其他資料夾的 session 沒有帳號，照舊用 `SendMessage` 與 issue。
-- **im 還沒接上。** `im-jcom` 有帳號、沒有憑證，等 `jg-base#248` 與 `jgct#263`。
+- **im 還沒接上。** `im-jcom` 有帳號、沒有憑證，等 `jgct#263`（欄位與 `CHAMBER_MODE`）以及 jcom 這個 user repo 裡的 sops Secret `im-chamber`（jg-base 只引用它，見 jg-base `im-chamber-identity` design D2）。
   - 在 `k8scc#108` 合併之前，給 im 的交辦仍然走 `inbox/`。
 - **連不上 chamber 不是停工的理由**：退路是 `SendMessage`、issue 和 console。
 
