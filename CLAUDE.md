@@ -198,10 +198,16 @@ session 從那裡起，而不是從某個 project repo——住在自己路由�
 
 ## agent 之間的委派（2026-11-13～15 ferry133 裁定；R 編號指 fleet-ops `openspec/changes/agent-delegation-envelope/proposal.md` 的裁定表）
 
-**現在生效的範圍（2026-11-18）**：最後一段「chamber」**還沒有生效**——正式的伺服器還沒上線、
-還沒有人的簽章金鑰；上線那天這一行與那一段的標題會一起改。在那之前不要去連 chamber，
-也不要因為連不上而停工。**其餘每一段即日生效**，載體是現有的 `SendMessage` 與 issue；
-在簽章金鑰出現之前，「人的指令」實際上只有同機的 transcript 指標這一種。
+**現在生效的範圍（2026-11-22 起，`fleet-ops-4c [50fff3]`）**：**每一段都生效，包括最後一段「chamber」。**
+- 正式伺服器是 `chamber.janncot.com`，跑在 `jcom` 上；房間 `fac`、`cust-jcom` 已經開好。
+- ferry133 的簽章公鑰在 `fleet-ops/chamber/allowed_signers`。
+- 起因是 ferry133 2026-11-22 的原話：「yes, i intent to replace the inbox channel to communicate with im.」
+- **這台 Mac 上有帳號的只有 `fo`、`jg-base`、`k8scc` 三個資料夾。**
+  - 身分由資料夾裡的 `.chamber-identity` 決定；伺服器網址在 `~/.claude/chamber/config.json`；憑證在 keychain 的 `chamber-login`。
+  - 其他資料夾的 session 沒有帳號，照舊用 `SendMessage` 與 issue。
+- **im 還沒接上。** `im-jcom` 有帳號、沒有憑證，等 `jg-base#248` 與 `jgct#263`。
+  - 在 `k8scc#108` 合併之前，給 im 的交辦仍然走 `inbox/`。
+- **連不上 chamber 不是停工的理由**：退路是 `SendMessage`、issue 和 console。
 
 ### 收到交辦時（你是收件方 B）
 
@@ -276,7 +282,7 @@ session 從那裡起，而不是從某個 project repo——住在自己路由�
 - **它擋的是轉述失真，不擋造假**——這台機器上的 session 寫得到那個檔。
 - **收件方打不開那個檔（另一台主機、任何一座 im）→ 一律當成沒有指令。**
 
-### chamber（尚未生效——見本節開頭那一行；伺服器上線後這一段才適用）
+### chamber（2026-11-22 起生效；im 還沒接上，見本節開頭）
 
 - **chamber 是聊天室，成員名單就是邊界**（R16、R17，2026-11-14）。成員只由 ferry133 改；
   agent 不開房間、不邀人。兩座 im 沒有共同的房間，跨叢集的事經 FAC 的 agent（R4）。
