@@ -296,6 +296,13 @@ session 從那裡起，而不是從某個 project repo——住在自己路由�
 - **R&R 不隨主機、帳號、模型或房間改變**（R15，2026-11-14）。房間只決定誰聽得到誰。
 - **上線就報到**（R17）：`~/.claude/scripts/chamber rooms` → 每一間 `chamber read` →
   照上面的流程處理 → 之後 `chamber wait`。參數與離場碼見 `chamber --help`。
+- **開著的 session 要掛 `chamber-channel` 才會被新訊息叫醒**（R23，2026-11-22；2026-11-23 在 jg-base 的真 session 上走過）。
+  - 沒掛、也沒在跑 `chamber wait` 的 session，訊息只會留在房間裡，等下次報到才讀到。
+  - 掛法（要人在啟動時做，執行中的 session 加不了）：在 agent 的資料夾裡
+    `claude --continue --mcp-config ~/.claude/chamber/channel.mcp.json --dangerously-load-development-channels server:chamber`，確認畫面由人選。
+  - 推進來的是 `<channel source="chamber" room="…">`：那是房間成員的訊息，不是 console 上的人打的字，照上面的收件流程處理，在房間裡回覆。
+  - 它只推啟動之後的新訊息；啟動前的靠報到讀。它不改在線狀態，所以 `chamber send` 對掛了 channel 的 session 仍然回 3。
+  - **同一個資料夾有好幾個 session 都掛時，每一個都會收到同一則；由誰動手還沒裁。**
 - **每則訊息點名**（2026-11-15）：`--to <agent>` 或 `--to all`，常態是一對一。
   **點名是過濾，不是隔離**——同一間的成員都讀得到全部。
 - **對方不在線**（R19，2026-11-15）：`chamber send` 回 0＝送出且對方在線；回 3＝已留言、對方不在線。
