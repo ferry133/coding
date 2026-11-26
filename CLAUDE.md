@@ -205,8 +205,13 @@ session 從那裡起，而不是從某個 project repo——住在自己路由�
 - **這台 Mac 上有帳號的只有 `fo`、`jg-base`、`k8scc` 三個資料夾。**
   - 身分由資料夾裡的 `.chamber-identity` 決定；伺服器網址在 `~/.claude/chamber/config.json`；憑證在 keychain 的 `chamber-login`。
   - 其他資料夾的 session 沒有帳號，照舊用 `SendMessage` 與 issue。
-- **`jcom` 的 im 已連上，但只在 `observe`（2026-11-23，jcom `c2241e7`）。** `im-jcom` 的 bridge 收得到 `cust-jcom` 的訊息，**不會送進 im 的 session**（`deliver` 沒開）。其他叢集的 im 還沒接。
-  - 在 `k8scc#108` 合併之前，給 im 的交辦仍然走 `inbox/`。
+- **`jcom` 與 `jg-jiahd` 的 im 都在 `deliver`（2026-11-25，jcom `47d5460`、jg-jiahd `bb272f7`；ferry133 當天在 console 點頭）。** 房間 `cust-jcom`、`cust-jg-jiahd`。
+  - `deliver` 下，房間裡點名 im 的訊息會送進它的 session——**前提是那個 session 活著**。兩座都開了 `SESSION_KEEP`，session 不需要有人開 ttyd。
+    - 由 `cluster.yaml` 的 `im_session_keep: true` 渲染（`jgct#278`；2026-11-26 jcom `ff86e50`、jg-jiahd `5c9048b`），不再是手寫 patch。
+    - jg-jiahd 的 nfs-subdir 由 `cluster.yaml` 的 `nfs_provisioner: false` 停掉（`jgct#279`；2026-11-26 jg-jiahd `e40510a`），不再是手寫 patch。
+    - **登入過期的 im 會報不在線**（映像 `615cc51` 起，`k8scc` PR #143；2026-11-26 在 jcom 量到 `online=no`、`chamber send` 回 3）。在那之前的映像上它報在線而不處理。session 剛起來的頭一分鐘仍可能報在線。沒有 ack 一律照「無 ack」處理。
+  - 房間訊息送進生產 im 並得到回覆：jg-jiahd 2026-11-25（送出到回覆 75 秒）、jcom 2026-11-26 ferry133 重新登入後（30 秒）。其他叢集的 im 還沒接。
+  - **給 im 的交辦走房間，不再放 `inbox/`**：`k8scc#108` 於 2026-11-25 合併（`5ac023d`），帶著它的映像不再把 inbox 的新檔宣告給 im；那個目錄只留給 im 寫 `-report.md`。映像升到生產之前的過渡期，舊映像仍會宣告 inbox 檔。
 - **連不上 chamber 不是停工的理由**：退路是 `SendMessage`、issue 和 console。
 
 ### 收到交辦時（你是收件方 B）
